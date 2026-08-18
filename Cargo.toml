@@ -1,0 +1,3 @@
+[workspace]
+members = ["cyclone_dummy"]
+resolver = "3"
