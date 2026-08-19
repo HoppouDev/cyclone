@@ -21,7 +21,10 @@ fn main() {
         .expect("failed to convert openrouter schema to rust types");
 
     let contents = type_space.to_stream().to_string();
-    let contents = rustfmt_wrapper::rustfmt(contents.clone()).unwrap_or(contents);
+    let contents = rustfmt_wrapper::rustfmt(contents.clone()).unwrap_or_else(|e| {
+        println!("cargo:warning=failed to format generated openrouter types: {e}");
+        contents
+    });
 
     let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
     fs::write(out_dir.join("openrouter_types.rs"), contents)
