@@ -1,0 +1,25 @@
+name: Rust
+
+on: [push, pull_request]
+
+permissions: {}
+
+jobs:
+  build:
+    name: Test `cargo check/build`
+    runs-on: ubuntu-latest
+
+    env:
+      CARGO_TERM_COLOR: always
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - run: rustup toolchain install stable --profile minimal --no-self-update --target wasm32-unknown-unknown
+
+      - run: |
+          cargo check --target wasm32-unknown-unknown
+          cargo build --target wasm32-unknown-unknown --release
+        working-directory: cyclone_dummy
