@@ -46,3 +46,83 @@ pub async fn images() -> Json<ImageGenerationResponse> {
         usage: None,
     })
 }
+
+#[cfg(test)]
+mod tests {
+    use axum::body::Body;
+    use axum::http::{Request, StatusCode};
+    use http_body_util::BodyExt;
+    use tower::ServiceExt;
+
+    use super::*;
+
+    async fn body_bytes(response: axum::http::Response<Body>) -> Vec<u8> {
+        response
+            .into_body()
+            .collect()
+            .await
+            .expect("failed to read response body")
+            .to_bytes()
+            .to_vec()
+    }
+
+    #[tokio::test]
+    async fn root_returns_ok() {
+        let response = router()
+            .oneshot(Request::builder().uri("/").body(Body::empty()).unwrap())
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = body_bytes(response).await;
+        assert_eq!(body, b"api/v1/");
+    }
+
+    #[tokio::test]
+    async fn images_returns_compliant_response() {
+        let response = router()
+            .oneshot(
+                Request::builder()
+                    .uri("/images")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::OK);
+
+        let body = body_bytes(response).await;
+        let parsed: ImageGenerationResponse =
+            serde_json::from_slice(&body).expect("response is not a valid ImageGenerationResponse");
+
+        assert_eq!(parsed.created, 1748372400);
+        assert!(parsed.usage.is_none());
+        assert_eq!(parsed.data.len(), 1);
+
+        let image = &parsed.data[0];
+        assert_eq!(image.media_type.as_deref(), Some("image/jpeg"));
+
+        let decoded = STANDARD
+            .decode(&image.b64_json)
+            .expect("b64_json is not valid base64");
+        assert_eq!(decoded, SAMPLE_JPG);
+        // JPEG magic bytes
+        assert_eq!(&decoded[0..2], &[0xFF, 0xD8]);
+    }
+
+    #[tokio::test]
+    async fn unknown_route_returns_not_found() {
+        let response = router()
+            .oneshot(
+                Request::builder()
+                    .uri("/nope")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+
+        assert_eq!(response.status(), StatusCode::NOT_FOUND);
+    }
+}
