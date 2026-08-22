@@ -1,6 +1,10 @@
 name: Rust
 
-on: [push, pull_request]
+on:
+  push:
+    paths: ["cyclone_dummy/**"]
+  pull_request:
+    paths: ["cyclone_dummy/**"]
 
 permissions: {}
 
