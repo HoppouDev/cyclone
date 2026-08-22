@@ -1,0 +1,13 @@
+name = "cyclone"
+main = ".svelte-kit/cloudflare/_worker.js"
+compatibility_date = "2026-08-17"
+compatibility_flags = ["nodejs_als"]
+workers_dev = true
+preview_urls = true
+
+[[d1_databases]]
+binding = "cyclone"
+
+[assets]
+binding = "ASSETS"
+directory = ".svelte-kit/cloudflare"

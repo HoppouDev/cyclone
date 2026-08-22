@@ -4,10 +4,10 @@ import { createAuth } from '$lib/server/auth';
 import { svelteKitHandler } from 'better-auth/svelte-kit';
 
 const handleBetterAuth: Handle = async ({ event, resolve }) => {
-	if (!event.platform?.env?.DB)
-		throw new Error('D1 binding "DB" not found - are you running with wrangler?');
+	if (!event.platform?.env?.cyclone)
+		throw new Error('D1 binding "cyclone" not found - are you running with wrangler?');
 
-	event.locals.auth = createAuth(event.platform.env.DB);
+	event.locals.auth = createAuth(event.platform.env.cyclone);
 
 	const { auth } = event.locals;
 	const session = await auth.api.getSession({ headers: event.request.headers });

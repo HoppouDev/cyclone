@@ -46,7 +46,7 @@ pnpm run build
 
 ## Deploying
 
-Create a D1 database and add its `database_id` (and `database_name`) to the `d1_databases` entry in `cyclone_frontend/wrangler.jsonc`:
+Create a D1 database and add its `database_id` (and `database_name`) to the `d1_databases` entry in `cyclone_frontend/wrangler.toml`:
 
 ```sh
 wrangler d1 create cyclone
